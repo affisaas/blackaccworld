@@ -1,0 +1,6 @@
+{
+  "name": "BlackAccWorld E-Commerce Store",
+  "description": "Premium e-commerce store for verified digital accounts, online reviews, bank accounts, and PVA solutions with crypto payments and 24/7 instant support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
