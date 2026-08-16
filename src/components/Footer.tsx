@@ -208,16 +208,6 @@ export const Footer: React.FC<FooterProps> = ({
 
         </div>
 
-        {/* SEO Keywords Cloud */}
-        <div className="pt-6 border-t border-zinc-800/80 space-y-2">
-          <h5 className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-            SEO Index &amp; Service Keywords:
-          </h5>
-          <p className="text-[11px] text-zinc-500 leading-relaxed">
-            Buy Google Reviews • Buy Google Local Guide Reviews • Buy TrustPilot Reviews • Buy Google GPS Reviews • Buy Glassdoor Reviews • Buy Facebook Reviews • Buy Zillow Reviews • Buy Thumbtack Reviews • Buy Google LSA Reviews • Buy Trustpilot Verified Reviews • Buy Houzz Reviews • Buy BBB Reviews • Buy Google Play Store Reviews • Buy HomeAdvisor Reviews • Buy Booking Reviews • Buy Website Product Reviews • Buy Home Star Reviews • Buy Chrome Extension Reviews • Buy WeddingWire Reviews • Buy Reviews.io Reviews • Buy Hotels Reviews • Buy QuickBooks Review • Buy Yelp Reviews • Buy Elite Yelp Reviews • Buy IMDb Reviews • Buy RealEstateAgents Reviews • Google Negative Reviews Removal • Buy Verified PayPal Account • Buy Restore PayPal Accounts • Buy Verified Cash App Accounts • Buy Verified Chase Bank Accounts • Buy Verified Relay Bank Accounts • Buy Verified Kraken Accounts • Buy Verified RedotPay Accounts • Buy USA Gmail Accounts • Buy PVA Gmail Accounts • Buy Aged Mix Country Gmail Accounts • Buy Outlook Accounts • Buy Hotmail Accounts • Buy Google Voice Accounts • Buy Textnow Accounts • Buy Edu Mail Accounts • Buy Talkatone Accounts • Buy Textplus Accounts • Buy GitHub Accounts • Buy Facebook Accounts • Buy Instagram Accounts • Buy Twitter Accounts • Buy LinkedIn Accounts • Buy WhatsApp Account Numbers • Buy Telegram Accounts
-          </p>
-        </div>
-
         {/* Bottom Copyright & Guarantee */}
         <div className="pt-6 border-t border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500">
           <div className="flex items-center gap-2">
