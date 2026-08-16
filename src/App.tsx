@@ -91,7 +91,7 @@ export default function App() {
       }
     }
   }, [selectedService, isBlogOpen, selectedPostSlug]);
-  // Sync URL state cleanly without '#' hashtag
+  // Clean SEO-friendly URL synchronization
   const updateUrl = (
     params: {
       service?: string | null;
@@ -102,32 +102,29 @@ export default function App() {
     replace = false
   ) => {
     try {
-      const url = new URL(window.location.href);
-      url.hash = ''; // ensure hash is always cleared
-
-      url.searchParams.delete('service');
-      url.searchParams.delete('category');
-      url.searchParams.delete('blog');
-      url.searchParams.delete('post');
-
-      if (params.service) {
-        url.searchParams.set('service', params.service);
-      } else if (params.blog) {
-        url.searchParams.set('blog', 'true');
-        if (params.post) {
-          url.searchParams.set('post', params.post);
-        }
-      } else if (params.category && params.category !== 'all') {
-        url.searchParams.set('category', params.category);
+      // Determine base path (e.g. if testing on gh-pages subpath /blackaccworld vs custom domain root /)
+      let basePath = '';
+      if (window.location.pathname.startsWith('/blackaccworld')) {
+        basePath = '/blackaccworld';
       }
 
-      const cleanQuery = url.searchParams.toString();
-      const newUrl = url.pathname + (cleanQuery ? `?${cleanQuery}` : '');
-      
+      let newPath = `${basePath}/`;
+      if (params.service) {
+        newPath = `${basePath}/service/${params.service}`;
+      } else if (params.blog) {
+        if (params.post) {
+          newPath = `${basePath}/blog/${params.post}`;
+        } else {
+          newPath = `${basePath}/blog`;
+        }
+      } else if (params.category && params.category !== 'all') {
+        newPath = `${basePath}/category/${params.category}`;
+      }
+
       if (replace) {
-        window.history.replaceState(null, '', newUrl);
+        window.history.replaceState(null, '', newPath);
       } else {
-        window.history.pushState(null, '', newUrl);
+        window.history.pushState(null, '', newPath);
       }
     } catch (e) {
       console.error(e);
@@ -135,53 +132,107 @@ export default function App() {
   };
 
   useEffect(() => {
-    const handleUrlChange = () => {
-      // 1. Immediately clean up any unwanted '#' from the address bar
-      if (window.location.hash) {
-        const cleanPath = window.location.pathname + (window.location.search || '');
-        window.history.replaceState(null, '', cleanPath);
+    const parseUrlAndRoute = () => {
+      let pathname = window.location.pathname;
+      if (pathname.startsWith('/blackaccworld')) {
+        pathname = pathname.replace('/blackaccworld', '');
+      }
+      // Remove leading and trailing slashes
+      const cleanPath = pathname.replace(/^\/+|\/+$/g, '');
+
+      // Check legacy query params for backward compatibility
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryService = urlParams.get('service');
+      const queryCategory = urlParams.get('category');
+      const queryBlog = urlParams.get('blog');
+      const queryPost = urlParams.get('post');
+      const hash = window.location.hash.replace('#', '');
+
+      // 1. Check Service Route: /service/:slug or /services/:slug or query ?service=...
+      let serviceSlug = '';
+      if (cleanPath.startsWith('service/')) {
+        serviceSlug = cleanPath.replace('service/', '');
+      } else if (cleanPath.startsWith('services/')) {
+        serviceSlug = cleanPath.replace('services/', '');
+      } else if (queryService) {
+        serviceSlug = queryService;
+      } else if (hash && ALL_SERVICES.some(s => s.slug === hash || s.id === hash)) {
+        serviceSlug = hash;
+      } else if (cleanPath && !cleanPath.startsWith('blog') && !cleanPath.startsWith('category')) {
+        // Direct slug without prefix: /buy-verified-paypal-account
+        const directFound = ALL_SERVICES.find(s => s.slug === cleanPath || s.id === cleanPath);
+        if (directFound) {
+          serviceSlug = directFound.slug;
+        }
       }
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const serviceParam = urlParams.get('service');
-      const categoryParam = urlParams.get('category');
-      const blogParam = urlParams.get('blog');
-      const postParam = urlParams.get('post');
-
-      if (serviceParam) {
-        const found = ALL_SERVICES.find(s => s.slug === serviceParam || s.id === serviceParam);
+      if (serviceSlug) {
+        const found = ALL_SERVICES.find(s => s.slug === serviceSlug || s.id === serviceSlug);
         if (found) {
           setSelectedService(found);
           setIsBlogOpen(false);
           setSelectedPostSlug(null);
+          // If loaded via old query or hash, replace with clean SEO path
+          if (queryService || hash || window.location.search) {
+            updateUrl({ service: found.slug }, true);
+          }
           return;
         }
       }
 
-      if (blogParam || postParam) {
+      // 2. Check Blog Route: /blog or /blog/:postSlug
+      if (cleanPath === 'blog' || cleanPath.startsWith('blog/') || queryBlog || queryPost || hash === 'blog' || hash.startsWith('blog/')) {
+        let postSlug: string | null = null;
+        if (cleanPath.startsWith('blog/')) {
+          postSlug = cleanPath.replace('blog/', '');
+        } else if (queryPost) {
+          postSlug = queryPost;
+        } else if (hash.startsWith('blog/')) {
+          postSlug = hash.replace('blog/', '');
+        }
+
         setIsBlogOpen(true);
         setSelectedService(null);
-        setSelectedPostSlug(postParam || null);
+        setSelectedPostSlug(postSlug);
+        if (queryBlog || queryPost || hash || window.location.search) {
+          updateUrl({ blog: true, post: postSlug }, true);
+        }
         return;
       }
 
-      if (categoryParam && ['reviews', 'bank_accounts', 'accounts', 'all'].includes(categoryParam)) {
-        setSelectedCategory(categoryParam as ServiceCategory);
+      // 3. Check Category Route: /category/:category
+      let catSlug = '';
+      if (cleanPath.startsWith('category/')) {
+        catSlug = cleanPath.replace('category/', '');
+      } else if (queryCategory) {
+        catSlug = queryCategory;
+      } else if (hash && ['reviews', 'bank_accounts', 'accounts', 'all'].includes(hash)) {
+        catSlug = hash;
+      }
+
+      if (catSlug && ['reviews', 'bank_accounts', 'accounts', 'all'].includes(catSlug)) {
+        setSelectedCategory(catSlug as ServiceCategory);
         setSelectedService(null);
         setIsBlogOpen(false);
         setSelectedPostSlug(null);
+        if (queryCategory || hash || window.location.search) {
+          updateUrl({ category: catSlug as ServiceCategory }, true);
+        }
         return;
       }
 
-      // Default home state
+      // 4. Default Home Route (/)
       setSelectedService(null);
       setIsBlogOpen(false);
       setSelectedPostSlug(null);
+      if (window.location.search || window.location.hash) {
+        updateUrl({}, true);
+      }
     };
 
-    handleUrlChange();
-    window.addEventListener('popstate', handleUrlChange);
-    return () => window.removeEventListener('popstate', handleUrlChange);
+    parseUrlAndRoute();
+    window.addEventListener('popstate', parseUrlAndRoute);
+    return () => window.removeEventListener('popstate', parseUrlAndRoute);
   }, []);
 
   const showToast = (msg: string) => {
@@ -346,6 +397,7 @@ export default function App() {
               setSelectedService(null);
               setSelectedCategory(cat);
               setSearchQuery('');
+              updateUrl({ category: cat });
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onSelectService={handleSelectService}
@@ -372,6 +424,7 @@ export default function App() {
           setSelectedService(null);
           setIsBlogOpen(false);
           setSelectedCategory(cat);
+          updateUrl({ category: cat });
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenWarrantyModal={() => setIsWarrantyModalOpen(true)}
