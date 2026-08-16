@@ -91,38 +91,97 @@ export default function App() {
       }
     }
   }, [selectedService, isBlogOpen, selectedPostSlug]);
+  // Sync URL state cleanly without '#' hashtag
+  const updateUrl = (
+    params: {
+      service?: string | null;
+      category?: ServiceCategory | null;
+      blog?: boolean;
+      post?: string | null;
+    },
+    replace = false
+  ) => {
+    try {
+      const url = new URL(window.location.href);
+      url.hash = ''; // ensure hash is always cleared
+
+      url.searchParams.delete('service');
+      url.searchParams.delete('category');
+      url.searchParams.delete('blog');
+      url.searchParams.delete('post');
+
+      if (params.service) {
+        url.searchParams.set('service', params.service);
+      } else if (params.blog) {
+        url.searchParams.set('blog', 'true');
+        if (params.post) {
+          url.searchParams.set('post', params.post);
+        }
+      } else if (params.category && params.category !== 'all') {
+        url.searchParams.set('category', params.category);
+      }
+
+      const cleanQuery = url.searchParams.toString();
+      const newUrl = url.pathname + (cleanQuery ? `?${cleanQuery}` : '');
+      
+      if (replace) {
+        window.history.replaceState(null, '', newUrl);
+      } else {
+        window.history.pushState(null, '', newUrl);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash) {
-        if (hash === 'blog') {
-          setIsBlogOpen(true);
+    const handleUrlChange = () => {
+      // 1. Immediately clean up any unwanted '#' from the address bar
+      if (window.location.hash) {
+        const cleanPath = window.location.pathname + (window.location.search || '');
+        window.history.replaceState(null, '', cleanPath);
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const serviceParam = urlParams.get('service');
+      const categoryParam = urlParams.get('category');
+      const blogParam = urlParams.get('blog');
+      const postParam = urlParams.get('post');
+
+      if (serviceParam) {
+        const found = ALL_SERVICES.find(s => s.slug === serviceParam || s.id === serviceParam);
+        if (found) {
+          setSelectedService(found);
+          setIsBlogOpen(false);
           setSelectedPostSlug(null);
-          setSelectedService(null);
-        } else if (hash.startsWith('blog/')) {
-          const blogSlug = hash.replace('blog/', '');
-          setIsBlogOpen(true);
-          setSelectedPostSlug(blogSlug);
-          setSelectedService(null);
-        } else {
-          const found = ALL_SERVICES.find(s => s.slug === hash || s.id === hash);
-          if (found) {
-            setSelectedService(found);
-            setIsBlogOpen(false);
-            setSelectedPostSlug(null);
-          } else if (hash === 'reviews' || hash === 'bank_accounts' || hash === 'accounts' || hash === 'all') {
-            setSelectedCategory(hash as ServiceCategory);
-            setIsBlogOpen(false);
-            setSelectedPostSlug(null);
-            setSelectedService(null);
-          }
+          return;
         }
       }
+
+      if (blogParam || postParam) {
+        setIsBlogOpen(true);
+        setSelectedService(null);
+        setSelectedPostSlug(postParam || null);
+        return;
+      }
+
+      if (categoryParam && ['reviews', 'bank_accounts', 'accounts', 'all'].includes(categoryParam)) {
+        setSelectedCategory(categoryParam as ServiceCategory);
+        setSelectedService(null);
+        setIsBlogOpen(false);
+        setSelectedPostSlug(null);
+        return;
+      }
+
+      // Default home state
+      setSelectedService(null);
+      setIsBlogOpen(false);
+      setSelectedPostSlug(null);
     };
 
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
   }, []);
 
   const showToast = (msg: string) => {
@@ -200,7 +259,7 @@ export default function App() {
     setSelectedService(service);
     setIsBlogOpen(false);
     setSelectedPostSlug(null);
-    window.location.hash = service.slug;
+    updateUrl({ service: service.slug });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -208,9 +267,7 @@ export default function App() {
     setSelectedService(null);
     setIsBlogOpen(false);
     setSelectedPostSlug(null);
-    if (window.location.hash) {
-      history.pushState(null, '', window.location.pathname);
-    }
+    updateUrl({ category: selectedCategory });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -218,7 +275,7 @@ export default function App() {
     setIsBlogOpen(true);
     setSelectedService(null);
     setSelectedPostSlug(slug || null);
-    window.location.hash = slug ? `blog/${slug}` : 'blog';
+    updateUrl({ blog: true, post: slug || null });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -251,7 +308,7 @@ export default function App() {
           setSelectedPostSlug(null);
           setSelectedCategory(cat);
           setSearchQuery('');
-          window.location.hash = cat === 'all' ? '' : cat;
+          updateUrl({ category: cat });
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onSelectService={handleSelectService}
