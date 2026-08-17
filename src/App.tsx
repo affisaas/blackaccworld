@@ -405,6 +405,7 @@ export default function App() {
             onDirectCryptoCheckout={handleDirectCryptoCheckout}
             onOpenTestModal={handleOpenTestModal}
             onOpenWarrantyModal={() => setIsWarrantyModalOpen(true)}
+            onOpenBlog={(slug) => handleOpenBlog(slug)}
           />
         ) : (
           <CategoryView

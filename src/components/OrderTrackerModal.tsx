@@ -46,11 +46,11 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({
     e.preventDefault();
     if (!searchKey.trim()) return;
 
-    const term = searchKey.trim().toLowerCase();
+    const term = (searchKey || '').trim().toLowerCase();
     const found = orders.find(
-      o => o.orderId.toLowerCase() === term || 
+      o => (o.orderId && o.orderId.toLowerCase() === term) || 
            (o.txid && o.txid.toLowerCase().includes(term)) ||
-           o.contactHandle.toLowerCase().includes(term)
+           (o.contactHandle && o.contactHandle.toLowerCase().includes(term))
     );
 
     if (found) {

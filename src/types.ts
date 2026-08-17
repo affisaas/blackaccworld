@@ -71,6 +71,33 @@ export interface OrderRecord {
   emailStatus?: 'sent' | 'failed' | 'sending' | 'idle';
 }
 
+export interface OfficialExternalLink {
+  title: string;
+  url: string;
+  domain: string;
+  description: string;
+  badge: 'Official Portal' | 'Support Guidelines' | 'Developer & API' | 'Security & Compliance' | 'Regulatory Standard' | 'Industry Resource';
+}
+
+export interface InternalServiceLink {
+  slug: string;
+  title: string;
+  category: 'reviews' | 'bank_accounts' | 'accounts';
+  iconKey: string;
+  startingPrice: number;
+  priceUnit?: string;
+  relation: string;
+  reason: string;
+}
+
+export interface InternalBlogLink {
+  slug: string;
+  title: string;
+  excerpt?: string;
+  readTime: string;
+  categoryLabel: string;
+}
+
 export interface BlogPost {
   id: string;
   slug: string;
@@ -89,5 +116,7 @@ export interface BlogPost {
   tags: string[];
   content: string; // Markdown or rich formatted text
   relatedServiceSlugs?: string[];
+  officialExternalLinks?: OfficialExternalLink[];
   featured?: boolean;
 }
+

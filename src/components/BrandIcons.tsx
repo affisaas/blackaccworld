@@ -1,15 +1,18 @@
 import React from 'react';
 
 interface BrandIconProps {
-  name: string;
+  name?: string;
+  iconKey?: string;
   className?: string;
   size?: number;
 }
 
-export const BrandIcon: React.FC<BrandIconProps> = ({ name, className = 'w-6 h-6', size }) => {
+export const BrandIcon: React.FC<BrandIconProps> = ({ name, iconKey, className = 'w-6 h-6', size }) => {
+  const rawName = name || iconKey || '';
+  const normalizedName = typeof rawName === 'string' ? rawName.toLowerCase() : '';
   const sizeStyle = size ? { width: `${size}px`, height: `${size}px` } : undefined;
 
-  switch (name.toLowerCase()) {
+  switch (normalizedName) {
     case 'google':
     case 'google-guide':
     case 'google-gps':

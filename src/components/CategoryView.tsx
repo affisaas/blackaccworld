@@ -112,13 +112,13 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
     }
 
     // Filter by search query
-    if (searchQuery.trim()) {
+    if (searchQuery && searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter(s =>
-        s.title.toLowerCase().includes(q) ||
-        s.shortDesc.toLowerCase().includes(q) ||
-        s.platform.toLowerCase().includes(q) ||
-        s.seoKeywords.some(k => k.toLowerCase().includes(q))
+        (s.title && s.title.toLowerCase().includes(q)) ||
+        (s.shortDesc && s.shortDesc.toLowerCase().includes(q)) ||
+        (s.platform && s.platform.toLowerCase().includes(q)) ||
+        (Array.isArray(s.seoKeywords) && s.seoKeywords.some(k => k && k.toLowerCase().includes(q)))
       );
     }
 
@@ -140,18 +140,18 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
       
       {/* Category Header Banner */}
       <div className="bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
-        <div className="max-w-3xl space-y-3 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+        <div className="max-w-3xl space-y-3.5 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-bold">
             <span>blackaccworld.com</span>
             <span className="text-zinc-600">•</span>
             <span>Category Hub</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
             {currentCategoryMeta.name}
           </h2>
 
-          <p className="text-sm text-zinc-300 leading-relaxed">
+          <p className="text-base sm:text-lg text-zinc-200 leading-relaxed font-normal">
             {currentCategoryMeta.desc}
           </p>
 
@@ -159,7 +159,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               onClick={onOpenWarrantyModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-amber-500/20 transition-colors"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-bold hover:bg-amber-500/20 transition-colors"
             >
               <ShieldCheck className="w-4 h-4 text-amber-400" />
               <span>1-Time Replacement Warranty Included</span>
@@ -167,7 +167,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
 
             <button
               onClick={() => onOpenTestModal()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-semibold hover:bg-sky-500/20 transition-colors"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs sm:text-sm font-bold hover:bg-sky-500/20 transition-colors"
             >
               <Sparkles className="w-4 h-4 text-sky-400" />
               <span>Test Before Buying Notice</span>
@@ -179,15 +179,15 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
       {/* Filter and Sorting Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
         {/* Sub Category Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           {subFilters.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveSubFilter(tab.id)}
-              className={`px-3 py-2 text-xs font-semibold rounded-xl whitespace-nowrap transition-all ${
+              className={`px-3.5 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-all ${
                 activeSubFilter === tab.id
                   ? 'bg-zinc-100 text-zinc-950 shadow-md'
-                  : 'bg-zinc-900/80 text-zinc-400 hover:text-white border border-zinc-800'
+                  : 'bg-zinc-900/80 text-zinc-300 hover:text-white border border-zinc-800'
               }`}
             >
               {tab.label}
@@ -197,14 +197,14 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
 
         {/* Sorting Dropdown */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-zinc-500 flex items-center gap-1">
-            <Filter className="w-3.5 h-3.5" />
+          <span className="text-xs sm:text-sm text-zinc-400 font-medium flex items-center gap-1.5">
+            <Filter className="w-4 h-4" />
             Sort:
           </span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs p-2 rounded-xl focus:outline-none focus:border-emerald-500"
+            className="bg-zinc-900 border border-zinc-800 text-zinc-100 text-xs sm:text-sm p-2 rounded-xl focus:outline-none focus:border-emerald-500 font-medium"
           >
             <option value="default">Featured / Default</option>
             <option value="popular">Most Popular</option>
@@ -217,12 +217,12 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
       {/* Services Grid */}
       {filteredServices.length === 0 ? (
         <div className="text-center py-16 bg-zinc-900/40 border border-zinc-800 rounded-2xl p-8 space-y-3">
-          <div className="text-zinc-400 font-semibold text-base">No services found</div>
-          <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+          <div className="text-zinc-200 font-bold text-lg">No services found</div>
+          <p className="text-sm text-zinc-400 max-w-sm mx-auto leading-relaxed">
             No matching services found for &ldquo;{searchQuery}&rdquo;. Try clearing your search or contact support directly on Telegram or WhatsApp for custom orders.
           </p>
           <div className="flex justify-center gap-3 pt-2">
-            <a href={CONTACT_INFO.telegramUrl} target="_blank" rel="noreferrer" className="px-4 py-2 bg-sky-600 text-white rounded-xl text-xs font-bold">
+            <a href={CONTACT_INFO.telegramUrl} target="_blank" rel="noreferrer" className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-sm font-bold">
               Ask on Telegram
             </a>
           </div>
@@ -243,17 +243,17 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
 
       {/* Customer Reviews & Trust Showcase */}
       <div className="pt-10 border-t border-zinc-800/80 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-400">
               Verified Client Feedback
             </span>
-            <h3 className="text-xl font-bold text-white mt-0.5">
+            <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
               Recent Buyer Reviews on blackaccworld.com
             </h3>
           </div>
-          <div className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl text-emerald-400 text-xs font-bold">
-            <Star className="w-3.5 h-3.5 fill-current" />
+          <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl text-emerald-400 text-xs sm:text-sm font-bold w-fit">
+            <Star className="w-4 h-4 fill-current text-amber-400" />
             <span>4.9 / 5.0 (1,480+ Reviews)</span>
           </div>
         </div>
@@ -264,20 +264,20 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-amber-400">
                   {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
-                <span className="text-[10px] text-zinc-500 font-mono">{t.date}</span>
+                <span className="text-xs text-zinc-400 font-mono">{t.date}</span>
               </div>
 
-              <p className="text-xs text-zinc-300 italic leading-relaxed">
+              <p className="text-sm text-zinc-200 italic leading-relaxed font-normal">
                 &ldquo;{t.text}&rdquo;
               </p>
 
-              <div className="pt-2 border-t border-zinc-800/60">
-                <div className="text-xs font-bold text-white">{t.name}</div>
-                <div className="text-[10px] text-zinc-500">{t.role}</div>
-                <div className="text-[10px] text-emerald-400 font-medium mt-0.5">
+              <div className="pt-2.5 border-t border-zinc-800/60">
+                <div className="text-sm font-bold text-white">{t.name}</div>
+                <div className="text-xs text-zinc-400">{t.role}</div>
+                <div className="text-xs text-emerald-400 font-semibold mt-0.5">
                   Ordered: {t.service}
                 </div>
               </div>
@@ -289,15 +289,15 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
       {/* FAQ Accordion */}
       <div className="pt-8 border-t border-zinc-800/80 space-y-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-zinc-400">
             Buyer Helpdesk
           </span>
-          <h3 className="text-xl font-bold text-white mt-0.5">
+          <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
             Frequently Asked Questions
           </h3>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {GENERAL_FAQS.map((faq, idx) => {
             const isExpanded = expandedFaqIndex === idx;
             return (
@@ -307,13 +307,13 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
               >
                 <button
                   onClick={() => setExpandedFaqIndex(isExpanded ? null : idx)}
-                  className="w-full text-left p-4 flex items-center justify-between text-xs font-bold text-zinc-200 hover:text-white"
+                  className="w-full text-left p-4 sm:p-5 flex items-center justify-between text-sm sm:text-base font-bold text-zinc-100 hover:text-white"
                 >
                   <span>{faq.q}</span>
-                  {isExpanded ? <ChevronUp className="w-4 h-4 text-emerald-400" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+                  {isExpanded ? <ChevronUp className="w-5 h-5 text-emerald-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-zinc-400 shrink-0" />}
                 </button>
                 {isExpanded && (
-                  <div className="px-4 pb-4 text-xs text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-2 bg-zinc-950/40">
+                  <div className="px-4 sm:px-5 pb-5 text-sm sm:text-base text-zinc-300 leading-relaxed border-t border-zinc-800/50 pt-3 bg-zinc-950/40">
                     {faq.a}
                   </div>
                 )}

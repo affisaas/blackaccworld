@@ -66,54 +66,54 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
               <BrandIcon name={service.iconKey} className="w-7 h-7" />
             </div>
             <div>
-              <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${getCategoryBadgeColor(service.category)}`}>
+              <span className={`text-xs font-bold uppercase px-2.5 py-0.5 rounded-full border ${getCategoryBadgeColor(service.category)}`}>
                 {service.platform}
               </span>
-              <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors mt-0.5 leading-snug line-clamp-1">
+              <h3 className="text-lg font-extrabold text-white group-hover:text-emerald-400 transition-colors mt-1 leading-snug line-clamp-1">
                 {service.title}
               </h3>
             </div>
           </div>
 
           {service.isHot && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0">
-              <Flame className="w-3 h-3 text-rose-400" />
+            <span className="inline-flex items-center gap-1 text-xs font-black px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0">
+              <Flame className="w-3.5 h-3.5 text-rose-400" />
               HOT
             </span>
           )}
         </div>
 
         {/* Short Description */}
-        <p className="text-xs text-zinc-400 mb-4 line-clamp-2 leading-relaxed">
+        <p className="text-sm text-zinc-300 mb-4 line-clamp-2 leading-relaxed">
           {service.shortDesc}
         </p>
 
         {/* Tier / Package Selector */}
         {service.tiers.length > 1 && (
-          <div className="mb-4 space-y-1.5" onClick={(e) => e.stopPropagation()}>
-            <label className="text-[11px] font-semibold text-zinc-300 flex items-center justify-between">
+          <div className="mb-4 space-y-2" onClick={(e) => e.stopPropagation()}>
+            <label className="text-xs font-bold text-zinc-200 flex items-center justify-between">
               <span>Select Option / Warranty:</span>
-              <span className="text-zinc-500">{service.tiers.length} variants</span>
+              <span className="text-zinc-400 text-xs font-normal">{service.tiers.length} variants</span>
             </label>
-            <div className="grid grid-cols-1 gap-1.5">
+            <div className="grid grid-cols-1 gap-2">
               {service.tiers.map((tier) => (
                 <button
                   key={tier.id}
                   type="button"
                   onClick={() => setSelectedTierId(tier.id)}
-                  className={`text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between border transition-all ${
+                  className={`text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center justify-between border transition-all ${
                     selectedTierId === tier.id
-                      ? 'bg-emerald-500/15 border-emerald-500/60 text-white font-medium shadow-sm'
-                      : 'bg-zinc-950/60 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
+                      ? 'bg-emerald-500/15 border-emerald-500/60 text-white font-semibold shadow-sm'
+                      : 'bg-zinc-950/60 border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className={`w-2 h-2 rounded-full ${selectedTierId === tier.id ? 'bg-emerald-400' : 'bg-zinc-700'}`} />
+                  <div className="flex items-center gap-2 truncate">
+                    <span className={`w-2.5 h-2.5 rounded-full ${selectedTierId === tier.id ? 'bg-emerald-400' : 'bg-zinc-700'}`} />
                     <span className="truncate">{tier.name}</span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 font-mono font-bold text-emerald-400">
                     <span>${tier.price}</span>
-                    {tier.unit && <span className="text-[10px] text-zinc-400 font-normal">/{tier.unit.replace('per ', '').replace('for ', '')}</span>}
+                    {tier.unit && <span className="text-xs text-zinc-400 font-sans font-normal">/{tier.unit.replace('per ', '').replace('for ', '')}</span>}
                   </div>
                 </button>
               ))}
@@ -123,23 +123,23 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
 
         {/* Single Tier Display */}
         {service.tiers.length === 1 && (
-          <div className="mb-4 bg-zinc-950/60 border border-zinc-800/80 p-2.5 rounded-xl flex items-center justify-between text-xs">
-            <span className="text-zinc-300 font-medium">{currentTier.name}</span>
-            <span className="text-emerald-400 font-mono font-bold text-sm">${currentTier.price}</span>
+          <div className="mb-4 bg-zinc-950/60 border border-zinc-800/80 p-3 rounded-xl flex items-center justify-between text-sm">
+            <span className="text-zinc-200 font-semibold">{currentTier.name}</span>
+            <span className="text-emerald-400 font-mono font-bold text-base">${currentTier.price}</span>
           </div>
         )}
 
         {/* Features highlights */}
-        <ul className="space-y-1.5 mb-4 text-[11px] text-zinc-400">
+        <ul className="space-y-2 mb-4 text-xs sm:text-sm text-zinc-300">
           {service.features.slice(0, 2).map((feat, idx) => (
-            <li key={idx} className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <li key={idx} className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span className="line-clamp-1">{feat}</span>
             </li>
           ))}
           {service.warrantyPolicy && (
-            <li className="flex items-center gap-1.5 text-amber-300/90 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <li className="flex items-center gap-2 text-amber-300 font-semibold">
+              <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
               <span className="line-clamp-1">1-Time Replacement Guaranteed</span>
             </li>
           )}
@@ -147,36 +147,36 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
       </div>
 
       {/* Bottom Pricing & Actions */}
-      <div className="pt-3 border-t border-zinc-800/80">
-        <div className="flex items-center justify-between mb-3">
+      <div className="pt-3.5 border-t border-zinc-800/80">
+        <div className="flex items-center justify-between mb-3.5">
           <div>
-            <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Total Price</div>
-            <div className="text-xl font-black text-white font-mono flex items-baseline gap-1">
+            <div className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Total Price</div>
+            <div className="text-2xl sm:text-3xl font-black text-white font-mono flex items-baseline gap-1.5">
               <span className="text-emerald-400">${currentTier.price}</span>
-              <span className="text-xs text-zinc-400 font-normal">
+              <span className="text-xs sm:text-sm text-zinc-400 font-sans font-normal">
                 {currentTier.unit || service.priceUnit}
               </span>
             </div>
           </div>
 
-          <div className="text-right flex items-center gap-1 text-[11px] text-zinc-400">
-            <Clock className="w-3 h-3 text-zinc-400" />
-            <span className="truncate max-w-[120px]">{service.deliveryTime.split('(')[0]}</span>
+          <div className="text-right flex items-center gap-1.5 text-xs sm:text-sm text-zinc-400">
+            <Clock className="w-4 h-4 text-zinc-400" />
+            <span className="truncate max-w-[130px] font-medium">{service.deliveryTime.split('(')[0]}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           <button
             id={`add-to-cart-btn-${service.id}`}
             type="button"
             onClick={handleAddToCart}
-            className={`py-2 px-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
+            className={`py-2.5 px-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
               addedAnimation 
                 ? 'bg-emerald-500 text-zinc-950' 
-                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700'
+                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700'
             }`}
           >
-            <ShoppingCart className="w-3.5 h-3.5" />
+            <ShoppingCart className="w-4 h-4" />
             <span>{addedAnimation ? 'Added!' : 'Add to Cart'}</span>
           </button>
 
@@ -184,24 +184,24 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
             id={`view-details-btn-${service.id}`}
             type="button"
             onClick={() => onViewDetails(service)}
-            className="py-2 px-2.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1 shadow-md shadow-emerald-950 transition-all active:scale-95"
+            className="py-2.5 px-3 rounded-xl font-extrabold text-sm bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950 transition-all active:scale-95"
           >
             <span>Order Now</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Quick Test Prompt */}
-        <div className="mt-2 text-center">
+        <div className="mt-2.5 text-center">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               onOpenTestModal(service);
             }}
-            className="text-[11px] text-zinc-400 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
+            className="text-xs text-zinc-400 hover:text-amber-400 font-medium transition-colors inline-flex items-center gap-1.5"
           >
-            <Sparkles className="w-3 h-3 text-amber-400" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Test this service first</span>
           </button>
         </div>

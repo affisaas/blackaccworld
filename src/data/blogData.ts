@@ -18,7 +18,7 @@ export const BLOG_POSTS: BlogPost[] = [
     coverImage: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&auto=format&fit=crop&q=80',
     tags: ['Google Reviews', 'Trustpilot', 'Local SEO', 'Reputation Management', 'Conversion Rate'],
     featured: true,
-    relatedServiceSlugs: ['buy-google-5-star-reviews', 'buy-trustpilot-reviews', 'buy-facebook-recommendations'],
+    relatedServiceSlugs: ['buy-google-reviews', 'buy-google-local-guide-reviews', 'buy-trustpilot-reviews', 'buy-trustpilot-verified-reviews', 'buy-facebook-reviews'],
     content: `
 ### Why Online Reputation Dictates 93% of Consumer Purchasing Decisions
 
@@ -73,7 +73,7 @@ To ensure reviews stay permanently visible on Google, Trustpilot, and Sitejabber
     coverImage: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200&auto=format&fit=crop&q=80',
     tags: ['US Bank Accounts', 'Mercury Bank', 'Chase Business', 'Brex', 'Stripe Integration'],
     featured: true,
-    relatedServiceSlugs: ['buy-mercury-bank-account', 'buy-chase-business-bank-account', 'buy-brex-bank-account', 'buy-relay-bank-account'],
+    relatedServiceSlugs: ['buy-verified-chase-bank-account', 'buy-verified-relay-bank-account', 'buy-verified-paypal-account', 'buy-verified-kraken-account', 'buy-verified-redotpay-account'],
     content: `
 ### The Challenge of Operating a Global Business Without US Banking
 
@@ -123,7 +123,7 @@ When purchasing or establishing business banking credentials through verified se
     coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&auto=format&fit=crop&q=80',
     tags: ['Aged Accounts', 'Gmail PVA', 'Telegram Aged', 'Twitter X Accounts', 'Anti-Ban'],
     featured: false,
-    relatedServiceSlugs: ['buy-aged-gmail-accounts', 'buy-telegram-aged-accounts', 'buy-facebook-aged-pva-accounts'],
+    relatedServiceSlugs: ['buy-gmail-accounts', 'buy-aged-gmail-accounts', 'buy-usa-pva-gmail-accounts', 'buy-github-accounts', 'buy-google-voice-accounts'],
     content: `
 ### The Silent Killer of Growth Campaigns: The "Fresh Account Sandbox"
 
@@ -171,7 +171,7 @@ Trust Score = (Account Age in Months × 1.8) + (Real SIM Verification × 2.5) + 
     coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&auto=format&fit=crop&q=80',
     tags: ['Reputation Repair', 'Negative Reviews', 'Google Maps', 'Trustpilot Strategy'],
     featured: false,
-    relatedServiceSlugs: ['buy-google-5-star-reviews', 'buy-trustpilot-reviews', 'buy-sitejabber-reviews'],
+    relatedServiceSlugs: ['google-negative-reviews-removal-services', 'buy-google-reviews', 'buy-yelp-reviews', 'buy-elite-yelp-reviews', 'buy-sitejabber-reviews'],
     content: `
 ### The Devastating Cost of a Single 1-Star Review
 
@@ -223,7 +223,7 @@ By strategically deploying **20 to 50 verified 5-star reviews** over a 2-week pe
     coverImage: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=1200&auto=format&fit=crop&q=80',
     tags: ['Crypto Checkout', 'USDT TRC20', 'Privacy', 'Zero Chargebacks', 'Blockchain'],
     featured: false,
-    relatedServiceSlugs: ['buy-binance-verified-accounts', 'buy-crypto-com-accounts', 'buy-bybit-verified-accounts'],
+    relatedServiceSlugs: ['buy-verified-kraken-account', 'buy-verified-redotpay-account', 'buy-verified-cash-app-account', 'buy-verified-paypal-account'],
     content: `
 ### The Inefficiencies of Legacy Fiat Processing for Global Digital Assets
 

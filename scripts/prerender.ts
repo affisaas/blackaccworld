@@ -3,6 +3,12 @@ import path from 'path';
 import { ALL_SERVICES, CONTACT_INFO } from '../src/data/servicesData';
 import { BLOG_POSTS } from '../src/data/blogData';
 import { ServiceCategory } from '../src/types';
+import { 
+  getOfficialExternalLinks, 
+  getRelatedInternalServices, 
+  getRelatedBlogArticles, 
+  getBlogOfficialLinks 
+} from '../src/data/serviceLinksData';
 
 const DIST_DIR = path.resolve(process.cwd(), 'dist');
 const BASE_HTML_PATH = path.join(DIST_DIR, 'index.html');
@@ -384,7 +390,10 @@ BLOG_POSTS.forEach(post => {
     ]
   };
 
-  const bodyContent = `
+      const blogOfficialLinks = getBlogOfficialLinks(post);
+      const postRelatedServices = ALL_SERVICES.filter(s => (post.relatedServiceSlugs || []).includes(s.slug));
+
+      const bodyContent = `
     <header style="padding: 24px 16px; border-bottom: 1px solid #27272a; max-width: 900px; margin: 0 auto;">
       <a href="/" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: #ffffff;">
         <img src="/favicon.svg" alt="BlackAccWorld Official Logo" width="44" height="44" />
@@ -421,6 +430,43 @@ BLOG_POSTS.forEach(post => {
           ${escapeHtml(post.content)}
         </div>
       </div>
+
+      ${postRelatedServices.length > 0 ? `
+      <!-- Recommended Verified Services Mentioned in this Guide -->
+      <section style="background: #18181b; border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 16px; padding: 28px; margin-top: 40px;">
+        <h3 style="font-size: 18px; font-weight: 800; color: #34d399; margin: 0 0 16px 0;">✨ Recommended Verified Services Mentioned in this Guide</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          ${postRelatedServices.map(s => `
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <a href="/service/${s.slug}" style="color: #ffffff; font-weight: 700; font-size: 14px; text-decoration: none; display: block; margin-bottom: 4px;">${escapeHtml(s.title)}</a>
+                <span style="font-size: 12px; color: #a1a1aa;">Starting at $${s.startingPrice} ${escapeHtml(s.priceUnit)}</span>
+              </div>
+              <a href="/service/${s.slug}" style="background: #34d399; color: #09090b; font-weight: 700; font-size: 12px; padding: 8px 14px; border-radius: 6px; text-decoration: none;">Order</a>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+      ` : ''}
+
+      ${blogOfficialLinks.length > 0 ? `
+      <!-- Official Platform Authority Citations -->
+      <section style="background: #09090b; border: 1px solid #27272a; border-radius: 16px; padding: 24px; margin-top: 32px;">
+        <h3 style="font-size: 16px; font-weight: 700; color: #38bdf8; margin: 0 0 8px 0;">🌐 Official External Authority Citations & Policy References</h3>
+        <p style="font-size: 12px; color: #a1a1aa; margin: 0 0 16px 0;">The technical parameters in this article are aligned with official documentation and compliance standards:</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${blogOfficialLinks.map(l => `
+            <a href="${l.url}" target="_blank" rel="noopener noreferrer external" style="background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; text-decoration: none; display: block;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <strong style="color: #ffffff; font-size: 13px;">${escapeHtml(l.title)} ↗</strong>
+                <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 9999px;">${escapeHtml(l.badge)}</span>
+              </div>
+              <p style="color: #a1a1aa; font-size: 12px; margin: 0;">${escapeHtml(l.description)}</p>
+            </a>
+          `).join('')}
+        </div>
+      </section>
+      ` : ''}
       
       <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 24px; margin-top: 40px; text-align: center;">
         <h3 style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Need Verified Accounts or 5-Star Reviews?</h3>
@@ -626,6 +672,10 @@ ALL_SERVICES.forEach(service => {
     ]
   };
 
+  const officialExternalLinks = getOfficialExternalLinks(service);
+  const relatedServices = getRelatedInternalServices(service);
+  const relatedBlogArticles = getRelatedBlogArticles(service);
+
   const bodyContent = `
     <header style="padding: 24px 16px; border-bottom: 1px solid #27272a; max-width: 1200px; margin: 0 auto;">
       <a href="/" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: #ffffff;">
@@ -692,6 +742,58 @@ ALL_SERVICES.forEach(service => {
           </div>
         </div>
       </div>
+
+      <!-- Related Companion Services (Internal Links) -->
+      ${relatedServices.length > 0 ? `
+      <section style="margin-top: 40px; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 28px;">
+        <h2 style="font-size: 20px; font-weight: 800; color: #34d399; margin: 0 0 16px 0;">🔗 Related Companion Services & Recommended Packages</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          ${relatedServices.map(s => `
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <a href="/service/${s.slug}" style="color: #ffffff; font-weight: 700; font-size: 14px; text-decoration: none; display: block; margin-bottom: 4px;">${escapeHtml(s.title)}</a>
+                <span style="font-size: 12px; color: #a1a1aa;">Starting at $${s.startingPrice} ${escapeHtml(s.priceUnit)} • ${escapeHtml(s.reason)}</span>
+              </div>
+              <a href="/service/${s.slug}" style="background: #34d399; color: #09090b; font-weight: 700; font-size: 12px; padding: 8px 14px; border-radius: 6px; text-decoration: none;">View</a>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+      ` : ''}
+
+      <!-- Official External Links -->
+      ${officialExternalLinks.length > 0 ? `
+      <section style="margin-top: 32px; background: #09090b; border: 1px solid #27272a; border-radius: 16px; padding: 24px;">
+        <h2 style="font-size: 18px; font-weight: 700; color: #38bdf8; margin: 0 0 8px 0;">🌐 Official Platform Documentation & External Authority Links</h2>
+        <p style="font-size: 13px; color: #a1a1aa; margin: 0 0 16px 0;">Verified external resources, compliance frameworks, and developer standards for ${escapeHtml(service.title)}:</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${officialExternalLinks.map(l => `
+            <a href="${l.url}" target="_blank" rel="noopener noreferrer external" style="background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; text-decoration: none; display: block;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <strong style="color: #ffffff; font-size: 14px;">${escapeHtml(l.title)} ↗</strong>
+                <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 9999px;">${escapeHtml(l.badge)}</span>
+              </div>
+              <p style="color: #a1a1aa; font-size: 12px; margin: 0;">${escapeHtml(l.description)}</p>
+            </a>
+          `).join('')}
+        </div>
+      </section>
+      ` : ''}
+
+      <!-- Related Strategy Articles (Internal Blog Links) -->
+      ${relatedBlogArticles.length > 0 ? `
+      <section style="margin-top: 32px; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 24px;">
+        <h2 style="font-size: 18px; font-weight: 700; color: #fbbf24; margin: 0 0 16px 0;">📚 Related Knowledge Base Guides & Growth Blueprints</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+          ${relatedBlogArticles.map(a => `
+            <a href="/blog/${a.slug}" style="background: #09090b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; text-decoration: none; display: block;">
+              <strong style="color: #ffffff; font-size: 13px; display: block; margin-bottom: 6px;">${escapeHtml(a.title)}</strong>
+              <p style="color: #a1a1aa; font-size: 12px; margin: 0; line-height: 1.4;">${escapeHtml(a.excerpt || '')}</p>
+            </a>
+          `).join('')}
+        </div>
+      </section>
+      ` : ''}
 
       <!-- FAQ Section -->
       <section style="margin-top: 48px; border-top: 1px solid #27272a; padding-top: 40px;">
