@@ -12,12 +12,15 @@ import {
   AlertCircle, 
   ExternalLink,
   Sparkles,
-  Receipt
+  Receipt,
+  Mail,
+  Loader2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CartItem, CryptoAddress, OrderRecord } from '../types';
 import { CRYPTO_WALLETS, CONTACT_INFO } from '../data/servicesData';
 import { generateQrMatrix } from '../utils/cryptoHelper';
+import { sendOrderEmails } from '../utils/emailService';
 
 interface CryptoCheckoutModalProps {
   isOpen: boolean;
@@ -39,8 +42,11 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
   const [selectedWalletId, setSelectedWalletId] = useState<string>('usdt-trc20');
   const [contactType, setContactType] = useState<'telegram' | 'whatsapp' | 'crypto_direct'>('telegram');
   const [contactHandle, setContactHandle] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [txid, setTxid] = useState('');
   const [isCopied, setIsCopied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<'sending' | 'sent' | 'failed' | 'idle'>('idle');
   const [completedOrder, setCompletedOrder] = useState<OrderRecord | null>(null);
 
   const selectedWallet = CRYPTO_WALLETS.find(w => w.id === selectedWalletId) || CRYPTO_WALLETS[0];
@@ -58,8 +64,10 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
+  const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setEmailStatus('sending');
 
     const orderId = `BAW-${Math.floor(100000 + Math.random() * 900000)}`;
     const newOrder: OrderRecord = {
@@ -71,9 +79,11 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
       cryptoAmount,
       cryptoAddress: selectedWallet.address,
       txid: txid.trim() || undefined,
+      customerEmail: customerEmail.trim() || (contactType === 'crypto_direct' && contactHandle.includes('@') ? contactHandle.trim() : undefined),
       contactMethod: contactType,
       contactHandle: contactHandle.trim() || 'Not Provided (Check TXID)',
-      status: txid.trim() ? 'Processing' : 'Awaiting Payment'
+      status: txid.trim() ? 'Processing' : 'Awaiting Payment',
+      emailStatus: 'sending'
     };
 
     // Save to local history
@@ -88,6 +98,21 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
 
     setCompletedOrder(newOrder);
     onOrderSuccess(newOrder);
+    setIsSubmitting(false);
+
+    // Asynchronously dispatch order confirmation & admin notification email via Gmail SMTP
+    try {
+      const emailResult = await sendOrderEmails(newOrder);
+      if (emailResult.success) {
+        setEmailStatus('sent');
+        newOrder.emailStatus = 'sent';
+      } else {
+        setEmailStatus('failed');
+        newOrder.emailStatus = 'failed';
+      }
+    } catch {
+      setEmailStatus('failed');
+    }
   };
 
   const getTelegramProofUrl = () => {
@@ -97,6 +122,7 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
       `Total: $${completedOrder.totalUsd} USD (${completedOrder.cryptoAmount} ${completedOrder.cryptoSymbol})\n` +
       `Wallet Paid: ${completedOrder.cryptoAddress}\n` +
       (completedOrder.txid ? `Transaction Hash / TXID: ${completedOrder.txid}\n` : '') +
+      (completedOrder.customerEmail ? `Customer Email: ${completedOrder.customerEmail}\n` : '') +
       `Contact: ${completedOrder.contactHandle}\n` +
       `\nPlease verify and deliver my items.`
     );
@@ -110,6 +136,7 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
       `Total: $${completedOrder.totalUsd} USD (${completedOrder.cryptoAmount} ${completedOrder.cryptoSymbol})\n` +
       `Wallet: ${completedOrder.cryptoAddress}\n` +
       (completedOrder.txid ? `TXID: ${completedOrder.txid}\n` : '') +
+      (completedOrder.customerEmail ? `Email: ${completedOrder.customerEmail}\n` : '') +
       `Contact: ${completedOrder.contactHandle}\n` +
       `\nPlease verify and deliver.`
     );
@@ -167,6 +194,31 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
                 </p>
               </div>
 
+              {/* Email Notification Status Badge */}
+              <div className="max-w-md mx-auto">
+                {emailStatus === 'sending' && (
+                  <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center gap-2 text-xs text-zinc-300">
+                    <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+                    <span>Sending order confirmation & notification email...</span>
+                  </div>
+                )}
+                {emailStatus === 'sent' && (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-center gap-2 text-xs text-emerald-400 font-medium">
+                    <Mail className="w-4 h-4" />
+                    <span>
+                      Confirmation email dispatched from <strong>smmbuy2022@gmail.com</strong>
+                      {completedOrder.customerEmail ? ` to ${completedOrder.customerEmail}` : ''}!
+                    </span>
+                  </div>
+                )}
+                {emailStatus === 'failed' && (
+                  <div className="p-3 bg-zinc-900/90 border border-zinc-800 rounded-xl flex items-center justify-center gap-2 text-xs text-zinc-400">
+                    <Mail className="w-4 h-4 text-emerald-400" />
+                    <span>Order logged. Send receipt to 24/7 Telegram / WhatsApp for instant delivery.</span>
+                  </div>
+                )}
+              </div>
+
               {/* Order Summary Box */}
               <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 max-w-md mx-auto text-left space-y-3">
                 <div className="flex justify-between text-xs text-zinc-400 pb-2 border-b border-zinc-800">
@@ -188,6 +240,15 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
                     <div className="text-zinc-500">Provided TXID / Hash:</div>
                     <div className="font-mono text-zinc-200 text-[11px] bg-zinc-950 p-2 rounded-lg break-all border border-zinc-800">
                       {completedOrder.txid}
+                    </div>
+                  </div>
+                )}
+
+                {completedOrder.customerEmail && (
+                  <div className="text-xs space-y-1">
+                    <div className="text-zinc-500">Client Confirmation Email:</div>
+                    <div className="font-mono text-emerald-400 text-[11px] bg-zinc-950 p-2 rounded-lg break-all border border-zinc-800">
+                      {completedOrder.customerEmail}
                     </div>
                   </div>
                 )}
@@ -329,9 +390,30 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
                   2. Contact &amp; Delivery Destination:
                 </label>
 
+                {/* Email for Confirmation Receipt */}
+                <div>
+                  <label className="text-xs text-zinc-400 block mb-1 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-emerald-400" />
+                      Client Email Address (for automated order confirmation &amp; receipt):
+                    </span>
+                    <span className="text-[10px] text-zinc-500">Recommended</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="client@example.com"
+                    className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs p-2.5 rounded-xl focus:outline-none focus:border-emerald-500"
+                  />
+                  <span className="text-[10px] text-zinc-500 mt-0.5 block">
+                    We will send the official invoice and delivery updates to this email from smmbuy2022@gmail.com
+                  </span>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-zinc-400 block mb-1">Contact Method:</label>
+                    <label className="text-xs text-zinc-400 block mb-1">Instant Support Method:</label>
                     <select
                       value={contactType}
                       onChange={(e) => setContactType(e.target.value as any)}
@@ -345,14 +427,14 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
 
                   <div>
                     <label className="text-xs text-zinc-400 block mb-1">
-                      Your {contactType === 'telegram' ? 'Telegram handle' : contactType === 'whatsapp' ? 'WhatsApp phone' : 'Contact email'}:
+                      Your {contactType === 'telegram' ? 'Telegram handle' : contactType === 'whatsapp' ? 'WhatsApp phone' : 'Contact handle'}:
                     </label>
                     <input
                       type="text"
                       required
                       value={contactHandle}
                       onChange={(e) => setContactHandle(e.target.value)}
-                      placeholder={contactType === 'telegram' ? '@username' : contactType === 'whatsapp' ? '+1 234 567 8900' : 'youremail@domain.com'}
+                      placeholder={contactType === 'telegram' ? '@username' : contactType === 'whatsapp' ? '+1 234 567 8900' : 'Telegram/WhatsApp handle'}
                       className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs p-2.5 rounded-xl focus:outline-none focus:border-emerald-500"
                     />
                   </div>
@@ -376,10 +458,20 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
               <div className="space-y-3 pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm uppercase tracking-wider rounded-xl shadow-xl shadow-emerald-950 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 text-white font-bold text-sm uppercase tracking-wider rounded-xl shadow-xl shadow-emerald-950 flex items-center justify-center gap-2 transition-transform active:scale-95"
                 >
-                  <CheckCircle2 className="w-5 h-5 text-emerald-200" />
-                  <span>Confirm Crypto Transfer &amp; Place Order</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Processing Order &amp; Dispatching Email...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-5 h-5 text-emerald-200" />
+                      <span>Confirm Crypto Transfer &amp; Place Order</span>
+                    </>
+                  )}
                 </button>
 
                 <div className="flex items-center justify-center gap-2 text-xs text-zinc-400 text-center">
@@ -395,3 +487,4 @@ export const CryptoCheckoutModal: React.FC<CryptoCheckoutModalProps> = ({
     </div>
   );
 };
+

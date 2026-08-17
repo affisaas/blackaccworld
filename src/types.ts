@@ -64,9 +64,11 @@ export interface OrderRecord {
   cryptoAmount: string | number;
   cryptoAddress: string;
   txid?: string;
+  customerEmail?: string;
   contactMethod?: 'telegram' | 'whatsapp' | 'email';
   contactHandle: string;
   status: 'Processing' | 'Awaiting Payment' | 'pending' | 'verifying' | 'processing' | 'completed';
+  emailStatus?: 'sent' | 'failed' | 'sending' | 'idle';
 }
 
 export interface BlogPost {
