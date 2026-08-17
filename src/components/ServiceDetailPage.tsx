@@ -551,6 +551,204 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
             </div>
           </div>
 
+          {/* Mobile-Only Order Configurator (Placed immediately after description & features) */}
+          <div className="block lg:hidden pt-2">
+            <div className="bg-zinc-900/95 rounded-2xl border-2 border-emerald-500/40 p-5 sm:p-6 space-y-5 shadow-2xl shadow-emerald-950/20">
+              
+              <div className="flex items-center justify-between pb-3.5 border-b border-zinc-800">
+                <div>
+                  <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    <span>Configure Your Order</span>
+                  </span>
+                  <span className="text-[11px] text-zinc-400 block mt-0.5">Select package tier &amp; instant checkout</span>
+                </div>
+                <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Instant Queue</span>
+                </span>
+              </div>
+
+              {/* 1. Package / Warranty Tier Selection */}
+              <div className="space-y-2.5">
+                <label className="text-xs sm:text-sm font-bold text-zinc-200 block">
+                  Select Package Tier:
+                </label>
+                <div className="space-y-2.5">
+                  {service.tiers.map((tier) => (
+                    <div
+                      key={tier.id}
+                      onClick={() => setSelectedTierId(tier.id)}
+                      className={`p-3.5 sm:p-4 rounded-xl border cursor-pointer transition-all ${
+                        selectedTierId === tier.id
+                          ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-sm'
+                          : 'bg-zinc-950/70 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            checked={selectedTierId === tier.id}
+                            onChange={() => setSelectedTierId(tier.id)}
+                            className="text-emerald-500 focus:ring-emerald-500 h-4 w-4 bg-zinc-900 border-zinc-700"
+                          />
+                          <div>
+                            <span className="font-bold text-sm text-zinc-100 block">{tier.name}</span>
+                            {tier.warranty && (
+                              <span className="text-xs text-amber-300 font-semibold">
+                                {tier.warranty}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-base font-bold font-mono text-emerald-400">
+                            ${tier.price}
+                          </span>
+                          <span className="text-xs text-zinc-400 block font-sans">USD</span>
+                        </div>
+                      </div>
+                      {tier.description && (
+                        <p className="text-xs text-zinc-300 mt-2 pl-7 leading-relaxed font-normal">
+                          {tier.description}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. Quantity Selector */}
+              <div className="space-y-2.5">
+                <label className="text-xs sm:text-sm font-bold text-zinc-200 block">
+                  Quantity:
+                </label>
+                <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                  <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-xl p-1">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="w-12 text-center font-bold font-mono text-white text-base">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {[1, 5, 10, 25].map(q => (
+                      <button
+                        key={q}
+                        type="button"
+                        onClick={() => setQuantity(q)}
+                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
+                          quantity === q 
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold' 
+                            : 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white'
+                        }`}
+                      >
+                        {q}x
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Target Link or Custom Notes */}
+              <div className="space-y-2">
+                <label className="text-xs sm:text-sm font-bold text-zinc-200 block">
+                  Target Link or Requirements (Optional):
+                </label>
+                <textarea
+                  value={customNotes}
+                  onChange={(e) => setCustomNotes(e.target.value)}
+                  placeholder="Paste target profile/listing URL, or custom keywords/instructions..."
+                  rows={2}
+                  className="w-full bg-zinc-950 text-zinc-100 text-xs sm:text-sm p-3 rounded-xl border border-zinc-800 focus:outline-none focus:border-emerald-500 placeholder-zinc-500"
+                />
+              </div>
+
+              {/* Total Calculation */}
+              <div className="pt-3.5 border-t border-zinc-800 flex items-center justify-between">
+                <div>
+                  <div className="text-xs uppercase text-zinc-400 font-bold">Total Price:</div>
+                  <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+                    ${totalPrice} <span className="text-xs sm:text-sm font-normal text-zinc-400 font-sans">USD</span>
+                  </div>
+                </div>
+                <div className="text-right text-xs sm:text-sm text-zinc-300 flex items-center gap-1.5 font-medium">
+                  <Clock className="w-4 h-4 text-zinc-400" />
+                  <span>{service.deliveryTime.split('(')[0]}</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-2.5 pt-1">
+                <button
+                  id="mobile-crypto-checkout-btn"
+                  onClick={() => {
+                    onDirectCryptoCheckout(service, selectedTier, quantity, customNotes);
+                  }}
+                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-95"
+                >
+                  <Coins className="w-4 h-4 text-emerald-200" />
+                  <span>Instant Crypto Checkout (12 Coins)</span>
+                </button>
+
+                <button
+                  id="mobile-add-to-cart-btn"
+                  onClick={() => {
+                    onAddToCart(service, selectedTier, quantity, customNotes);
+                  }}
+                  className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-xs sm:text-sm rounded-xl border border-zinc-700 flex items-center justify-center gap-2 transition-all"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>Add To Cart</span>
+                </button>
+
+                {/* Direct Telegram & WhatsApp Desk */}
+                <div className="grid grid-cols-2 gap-2.5 pt-1">
+                  <a
+                    href={getTelegramOrderUrl()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 bg-sky-500/10 hover:bg-sky-500/15 border border-sky-500/20 text-sky-300 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all text-center"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Telegram Desk</span>
+                  </a>
+
+                  <a
+                    href={getWhatsappOrderUrl()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 text-emerald-300 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all text-center"
+                  >
+                    <PhoneCall className="w-4 h-4" />
+                    <span>WhatsApp Desk</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Reassurance Note */}
+              <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 text-xs text-zinc-400 flex items-center gap-2">
+                <RotateCcw className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>1-Time Free Replacement Warranty &amp; 24/7 Priority Support Included</span>
+              </div>
+
+            </div>
+          </div>
+
           {/* What You Receive (Deliverables) */}
           <div className="space-y-3.5">
             <h2 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-zinc-300 flex items-center gap-2">
@@ -878,8 +1076,8 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
 
         </div>
 
-        {/* Right Column (5 cols): Sticky Order & Instant Checkout Card */}
-        <div className="lg:col-span-5">
+        {/* Right Column (5 cols): Sticky Order & Instant Checkout Card (Desktop Only: hidden on mobile, shown on lg+) */}
+        <div className="hidden lg:block lg:col-span-5">
           <div className="sticky top-24 space-y-4">
             
             <div className="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-6 sm:p-7 space-y-5 shadow-xl backdrop-blur-sm">
