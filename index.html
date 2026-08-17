@@ -46,60 +46,105 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Store",
-      "name": "BlackAccWorld",
-      "url": "https://blackaccworld.com/",
-      "logo": "https://blackaccworld.com/favicon.svg",
-      "image": "https://blackaccworld.com/favicon.svg",
-      "description": "Buy verified accounts, 5-star Google reviews, and US bank accounts at BlackAccWorld. 1-time replacement warranty with 24/7 instant crypto checkout & support.",
-      "telephone": "+13073939979",
-      "priceRange": "$$",
-      "currenciesAccepted": "USD, BTC, USDT, ETH, SOL, LTC",
-      "paymentAccepted": "Cryptocurrency, Bitcoin, Tether USDT, Ethereum, Solana, Litecoin",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+13073939979",
-        "contactType": "customer service",
-        "availableLanguage": ["English", "Bengali"]
-      },
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Digital Accounts & Reviews Services",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Buy Google Reviews",
-              "description": "High-retention 5-star Google Business ratings from aged real accounts with 1-time replacement warranty."
-            }
+      "@graph": [
+        {
+          "@type": "OnlineStore",
+          "@id": "https://blackaccworld.com/#store",
+          "name": "BlackAccWorld",
+          "url": "https://blackaccworld.com/",
+          "logo": "https://blackaccworld.com/favicon.svg",
+          "image": "https://blackaccworld.com/favicon.svg",
+          "description": "Buy verified accounts, 5-star Google reviews, and US bank accounts at BlackAccWorld. 1-time replacement warranty with 24/7 instant crypto checkout & support.",
+          "telephone": "+13073939979",
+          "priceRange": "$$",
+          "currenciesAccepted": "USD, BTC, USDT, ETH, SOL, LTC",
+          "paymentAccepted": "Cryptocurrency, Bitcoin, Tether USDT, Ethereum, Solana, Litecoin",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "30 N Gould St Ste R",
+            "addressLocality": "Sheridan",
+            "addressRegion": "WY",
+            "postalCode": "82801",
+            "addressCountry": "US"
           },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Buy Verified PayPal Accounts",
-              "description": "Fully KYC verified PayPal business & personal accounts with transaction history."
-            }
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+13073939979",
+            "contactType": "customer service",
+            "availableLanguage": ["English", "Bengali"]
           },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Buy Verified Cash App Accounts",
-              "description": "100% BTC-enabled & SSN verified Cash App accounts for immediate transfers."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Buy PVA Gmail Accounts",
-              "description": "Phone-verified aged and fresh bulk Gmail accounts for marketing outreach."
-            }
+          "sameAs": [
+            "https://t.me/EgSupport24",
+            "https://wa.me/13073939979"
+          ],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Digital Accounts & Reviews Services",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Buy Google Reviews",
+                  "description": "High-retention 5-star Google Business ratings from aged real accounts with 1-time replacement warranty."
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Buy Verified PayPal Accounts",
+                  "description": "Fully KYC verified PayPal business & personal accounts with transaction history."
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Buy Verified Cash App Accounts",
+                  "description": "100% BTC-enabled & SSN verified Cash App accounts for immediate transfers."
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Buy PVA Gmail Accounts",
+                  "description": "Phone-verified aged and fresh bulk Gmail accounts for marketing outreach."
+                }
+              }
+            ]
           }
-        ]
-      }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://blackaccworld.com/#organization",
+          "name": "BlackAccWorld",
+          "url": "https://blackaccworld.com/",
+          "logo": "https://blackaccworld.com/favicon.svg",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+13073939979",
+            "contactType": "customer support",
+            "email": "support@blackaccworld.com",
+            "availableLanguage": ["English", "Bengali"]
+          },
+          "sameAs": [
+            "https://t.me/EgSupport24",
+            "https://wa.me/13073939979"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://blackaccworld.com/#website",
+          "name": "BlackAccWorld",
+          "url": "https://blackaccworld.com/",
+          "description": "Premium Marketplace for Verified Accounts, Google Reviews & US Bank Accounts",
+          "publisher": {
+            "@id": "https://blackaccworld.com/#organization"
+          }
+        }
+      ]
     }
     </script>
   </head>
