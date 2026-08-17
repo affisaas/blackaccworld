@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b" />
+      <stop offset="100%" stop-color="#18181b" />
+    </linearGradient>
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Hexagon/Shield -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bgGrad)" stroke="#27272a" stroke-width="8" />
+  
+  <!-- Subtle Emerald Inner Border -->
+  <rect x="36" y="36" width="440" height="440" rx="100" fill="none" stroke="url(#emeraldGrad)" stroke-width="4" stroke-opacity="0.5" />
+
+  <!-- Background Glow -->
+  <circle cx="256" cy="256" r="140" fill="#10b981" opacity="0.12" filter="url(#glow)" />
+
+  <!-- Shield Shape -->
+  <path d="M 256 95 L 375 145 C 375 255 256 385 256 385 C 256 385 137 255 137 145 Z" fill="#18181b" stroke="url(#emeraldGrad)" stroke-width="12" stroke-linejoin="round" />
+
+  <!-- Inner Shield Highlight -->
+  <path d="M 256 120 L 350 160 C 350 240 256 350 256 350 C 256 350 162 240 162 160 Z" fill="#09090b" stroke="#27272a" stroke-width="4" />
+
+  <!-- Stylized Monogram "B" with cyber cutouts -->
+  <text x="228" y="275" font-family="'JetBrains Mono', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="900" font-size="160" fill="url(#emeraldGrad)" text-anchor="middle" filter="url(#glow)">B</text>
+  
+  <text x="295" y="275" font-family="'JetBrains Mono', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="900" font-size="160" fill="#ffffff" text-anchor="middle">W</text>
+
+  <!-- Verified Checkmark Badge at Bottom Right -->
+  <g transform="translate(340, 340)">
+    <circle cx="20" cy="20" r="44" fill="#09090b" stroke="#10b981" stroke-width="6" />
+    <circle cx="20" cy="20" r="36" fill="url(#emeraldGrad)" />
+    <!-- Checkmark icon -->
+    <path d="M 6 20 L 16 30 L 34 11" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>
