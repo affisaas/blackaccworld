@@ -13,7 +13,7 @@ export default defineConfig(() => {
       },
     },
     build: {
-      minify: 'esbuild',
+      minify: 'esbuild' as const,
       cssMinify: true,
       sourcemap: false,
       chunkSizeWarningLimit: 1000,
