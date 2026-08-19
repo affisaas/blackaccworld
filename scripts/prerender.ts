@@ -9,6 +9,7 @@ import {
   getRelatedBlogArticles, 
   getBlogOfficialLinks 
 } from '../src/data/serviceLinksData';
+import { getServiceSeoRichContent } from '../src/utils/seoContentGenerator';
 
 const DIST_DIR = path.resolve(process.cwd(), 'dist');
 const BASE_HTML_PATH = path.join(DIST_DIR, 'index.html');
@@ -496,14 +497,16 @@ BLOG_POSTS.forEach(post => {
 });
 
 // ==========================================
-// 3. GENERATE ALL 31+ SERVICE PAGES
+// 3. GENERATE ALL 54 SERVICE PAGES
 // ==========================================
 ALL_SERVICES.forEach(service => {
   const catName = getCategoryName(service.category);
   const canonicalUrl = `https://blackaccworld.com/service/${service.slug}`;
-  const displayTitle = service.title.toLowerCase().startsWith('buy ') ? service.title : `Buy ${service.title}`;
-  const title = `${displayTitle} | 1-Time Replacement Warranty | BlackAccWorld`;
-  const description = `${service.shortDesc} Instant crypto checkout with 24/7 delivery & live customer support on Telegram & WhatsApp.`;
+  const seoData = getServiceSeoRichContent(service);
+  
+  // Use dedicated, keyword-targeted title and meta description
+  const title = seoData.metaTitle || `${service.title} | BlackAccWorld`;
+  const description = seoData.metaDescription || `${service.shortDesc} Instant crypto checkout with 24/7 delivery & live customer support.`;
 
   const tierPrices = service.tiers.map(t => t.price);
   const lowPrice = Math.min(...tierPrices).toFixed(2);
@@ -540,6 +543,13 @@ ALL_SERVICES.forEach(service => {
   ];
 
   const mergedFaqs = [...defaultFaqs];
+  if (seoData.expandedFaqs && seoData.expandedFaqs.length > 0) {
+    seoData.expandedFaqs.forEach(ef => {
+      if (!mergedFaqs.some(m => m.q.toLowerCase() === ef.q.toLowerCase())) {
+        mergedFaqs.push(ef);
+      }
+    });
+  }
   categoryFaqs.forEach(cf => {
     if (!mergedFaqs.some(m => m.q.toLowerCase() === cf.q.toLowerCase())) {
       mergedFaqs.push(cf);
@@ -742,6 +752,75 @@ ALL_SERVICES.forEach(service => {
           </div>
         </div>
       </div>
+
+      <!-- Comprehensive SEO Master Guide & Technical Overview -->
+      <section style="margin-top: 48px; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 32px;">
+        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #34d399; letter-spacing: 0.05em; display: inline-block; margin-bottom: 8px;">SEO Master Guide &amp; Technical Overview</span>
+        <h2 style="font-size: 26px; font-weight: 800; color: #ffffff; margin: 0 0 16px 0; line-height: 1.3;">Complete Strategic Guide: ${escapeHtml(service.title)} for High-Growth Brands &amp; Digital Ventures</h2>
+        <p style="font-size: 15px; color: #d4d4d8; line-height: 1.7; margin-bottom: 24px;">${escapeHtml(seoData.executiveSummary)}</p>
+
+        <!-- Technical Specs Grid -->
+        <h3 style="font-size: 16px; font-weight: 700; color: #34d399; margin: 24px 0 12px 0;">Technical Specifications &amp; Quality Parameters</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 32px;">
+          ${seoData.technicalSpecs.map(spec => `
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 10px; padding: 14px;">
+              <span style="font-size: 11px; color: #71717a; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px;">${escapeHtml(spec.label)}</span>
+              <strong style="font-size: 13px; color: #f4f4f5; display: block;">${escapeHtml(spec.value)}</strong>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Deep Article Sections -->
+        ${seoData.deepArticleSections.map(sec => `
+          <article style="background: #09090b; border: 1px solid #27272a; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
+            <h3 style="font-size: 20px; font-weight: 700; color: #ffffff; margin: 0 0 8px 0;">${escapeHtml(sec.heading)}</h3>
+            ${sec.subheading ? `<h4 style="font-size: 14px; font-weight: 600; color: #34d399; margin: 0 0 16px 0;">${escapeHtml(sec.subheading)}</h4>` : ''}
+            
+            ${sec.paragraphs.map(p => `
+              <p style="font-size: 14px; color: #a1a1aa; line-height: 1.7; margin-bottom: 14px;">${escapeHtml(p)}</p>
+            `).join('')}
+
+            ${sec.keyTakeaways && sec.keyTakeaways.length > 0 ? `
+              <div style="background: rgba(52, 211, 153, 0.05); border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 10px; padding: 16px; margin: 16px 0;">
+                <strong style="font-size: 13px; color: #34d399; display: block; margin-bottom: 8px;">Key Takeaways:</strong>
+                <ul style="font-size: 13px; color: #d4d4d8; padding-left: 20px; margin: 0; line-height: 1.6;">
+                  ${sec.keyTakeaways.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            ${sec.table ? `
+              <div style="overflow-x: auto; margin-top: 16px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid #27272a; background: #18181b;">
+                      ${sec.table.headers.map(h => `<th style="padding: 10px 14px; color: #ffffff; font-weight: 700;">${escapeHtml(h)}</th>`).join('')}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${sec.table.rows.map((row, rIdx) => `
+                      <tr style="border-bottom: 1px solid #27272a; background: ${rIdx % 2 === 0 ? '#09090b' : '#121214'};">
+                        ${row.map((cell, cIdx) => `<td style="padding: 10px 14px; color: ${cIdx === 0 ? '#ffffff' : '#a1a1aa'};">${escapeHtml(cell)}</td>`).join('')}
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            ` : ''}
+          </article>
+        `).join('')}
+
+        <!-- Why Choose BlackAccWorld -->
+        <h3 style="font-size: 18px; font-weight: 700; color: #ffffff; margin: 28px 0 16px 0;">Why Choose BlackAccWorld for ${escapeHtml(service.title)}</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+          ${seoData.whyChoosePoints.map(pt => `
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 18px;">
+              <strong style="font-size: 14px; color: #34d399; display: block; margin-bottom: 6px;">✓ ${escapeHtml(pt.title)}</strong>
+              <p style="font-size: 13px; color: #a1a1aa; margin: 0; line-height: 1.5;">${escapeHtml(pt.desc)}</p>
+            </div>
+          `).join('')}
+        </div>
+      </section>
 
       <!-- Related Companion Services (Internal Links) -->
       ${relatedServices.length > 0 ? `

@@ -42,6 +42,7 @@ import {
 } from '../data/serviceLinksData';
 import { ServiceCard } from './ServiceCard';
 import { SeoRichContent } from './SeoRichContent';
+import { getServiceSeoRichContent } from '../utils/seoContentGenerator';
 
 interface ServiceDetailPageProps {
   service: ServiceItem;
@@ -340,11 +341,31 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
       el.textContent = JSON.stringify(schemaData, null, 2);
     };
 
+    // Dynamic Title, Meta Description & Canonical updates
+    const seoData = getServiceSeoRichContent(service);
+    const originalTitle = document.title;
+    document.title = seoData.metaTitle || `${service.title} | BlackAccWorld`;
+
+    let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    const originalDesc = metaDesc ? metaDesc.getAttribute('content') : '';
+    if (metaDesc) {
+      metaDesc.setAttribute('content', seoData.metaDescription || service.shortDesc);
+    }
+
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    const originalCanonical = canonicalLink ? canonicalLink.getAttribute('href') : '';
+    if (canonicalLink) {
+      canonicalLink.setAttribute('href', serviceUrl);
+    }
+
     injectScript('dynamic-product-service-jsonld', productAndServiceSchema);
     injectScript('dynamic-breadcrumb-jsonld', breadcrumbSchema);
     injectScript('dynamic-faq-jsonld', faqSchema);
 
     return () => {
+      document.title = originalTitle;
+      if (metaDesc && originalDesc) metaDesc.setAttribute('content', originalDesc);
+      if (canonicalLink && originalCanonical) canonicalLink.setAttribute('href', originalCanonical);
       ['dynamic-product-service-jsonld', 'dynamic-breadcrumb-jsonld', 'dynamic-faq-jsonld'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.remove();
